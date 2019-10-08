@@ -53,31 +53,31 @@ public class ResourcesController {
      * addResource -> TODO: api-link
      */
     @PostMapping("/refill")
-    public ResponseEntity<Map<String, Object>> addResource(@RequestBody List<Resource> resources) throws Exception {
+    public Response<Object> addResource(@RequestBody List<Resource> resources) throws Exception {
         store = storeRepository.store(store, resources);
 
-        return ResponseEntity.ok(Map.of("message", resources.size() + " resources added to store"));
+        return new Response<>(resources.size() + " resources added to store");
     }
 
     /**
      * fetchAvailable -> TODO: api-link
      */
     @GetMapping("/store")
-    public ResponseEntity<Map<String, Object>> fetchAvailable() throws Exception{
+    public Response<List<Resource>> fetchAvailable() throws Exception{
         List<Resource> items = storeRepository.list(store);
 
         if (items.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "no items found");
         }
 
-        return ResponseEntity.ok(Map.of("message", items.size() + " resources found", "data", items));
+        return new Response<>(items.size() + " resources found", items);
     }
 
     /**
      * order -> TODO: api-link
      */
     @PostMapping("/order/{id}")
-    public ResponseEntity<Map<String, Object>> order(@PathVariable(value="id") Integer id) {
+    public Response<Object> order(@PathVariable(value="id") Integer id) {
         Optional<Recipe> ropt = recipeRepository.findById(id);
         if (!ropt.isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "recipe with id " + id + " not found");
@@ -89,7 +89,7 @@ public class ResourcesController {
             throw new ResponseStatusException(HttpStatus.IM_USED, e.getMessage());
         }
 
-        return ResponseEntity.ok(Map.of("message", "ordered " + ropt.get().getTitle()));
+        return new Response<>("ordered " + ropt.get().getTitle());
     }
 
 }
